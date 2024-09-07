@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Task List</title>
+  </head>
+  <body>
+    <h1>Task List</h1>
+    <form method="get">
+      <label for="status">Filter by status:</label>
+      <select name="status" id="status">
+        <option value="">All</option>
+        <option value="To Do">To Do</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Done">Done</option>
+      </select>
+      <label for="sort_by">Sort by:</label>
+      <select name="sort_by" id="sort_by">
+        <option value="priority">Priority</option>
+        <option value="due_date">Due Date</option>
+      </select>
+      <button type="submit">Apply</button>
+    </form>
+    <table>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Due Date</th>
+        <th>Priority</th>
+        <th>Status</th>
+      </tr>
+      {% for task in tasks %}
+      <tr>
+        <td>{{ task.title }}</td>
+        <td>{{ task.description }}</td>
+        <td>{{ task.due_date }}</td>
+        <td>{{ task.get_priority_display }}</td>
+        <td>{{ task.get_status_display }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>
