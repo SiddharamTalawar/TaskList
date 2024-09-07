@@ -5,21 +5,38 @@
   </head>
   <body>
     <h1>Task List</h1>
-    <form method="get">
+    <!-- <form action="{% url 'search-task-list' %}">
+      <label for="search">Search:</label>
+      <input type="text" name="search" id="search" />
+      <button type="submit">Search</button>
+    </form> -->
+    <form method="get" action="{% url 'task-list' %}">
+      <label for="search">Search:</label>
+      <input
+        type="text"
+        name="search"
+        id="search"
+        placeholder="Search by title/description"
+      />
       <label for="status">Filter by status:</label>
       <select name="status" id="status">
         <option value="">All</option>
-        <option value="To Do">To Do</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Done">Done</option>
+        <option value="TODO">To Do</option>
+        <option value="IN_PROGRESS">In Progress</option>
+        <option value="DONE">Done</option>
       </select>
-      <label for="sort_by">Sort by:</label>
-      <select name="sort_by" id="sort_by">
-        <option value="priority">Priority</option>
-        <option value="due_date">Due Date</option>
+      <label for="due_date">Due Date:</label>
+      <input type="date" name="due_date" id="due_date" />
+      <label for="priority">Priority:</label>
+      <select name="priority" id="priority">
+        <option value="">All</option>
+        <option value="1">HIGH</option>
+        <option value="2">MEDIUM</option>
+        <option value="3">LOW</option>
       </select>
       <button type="submit">Apply</button>
     </form>
+    {% if tasks %}
     <table>
       <tr>
         <th>Title</th>
@@ -38,5 +55,9 @@
       </tr>
       {% endfor %}
     </table>
+    {% else %}
+    <p>No tasks found for these filters/search.</p>
+    search: {{ search }}, status: {{ status }}, priority: {{ priority }},
+    due_date: {{ due_date }} {% endif %}
   </body>
 </html>
