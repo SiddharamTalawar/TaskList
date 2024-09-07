@@ -16,6 +16,12 @@ def task_list(request):
     search = request.GET.get('search')
     # print("................", status, priority, due_date, search)
 
+    # getting task which are due today and whose status is not done
+    today = datetime.date.today()
+    tasks_due_today = tasks.filter(Q(due_date=today) & ~Q(status="DONE"))
+    num_of_tasks_due_today = tasks_due_today.count()
+    # print("todays tasks.....", todays_tasks.count())
+
     # applying filters
     if search:
         tasks = tasks.filter(Q(title__icontains=search) |
@@ -35,16 +41,23 @@ def task_list(request):
         'priority': priority,
         'due_date': due_date,
         'search': search,
-
+        'num_of_tasks_due_today': num_of_tasks_due_today
     }
     return render(request, 'task_list.html', context)
 
 
-def search_task_list(request):
+def tasks_due_today(request):
+    """
+    View function for listing tasks due today.
+    """
     tasks = Task.objects.all()
-    query = request.GET.get('search')
-    if query:
-        tasks = tasks.filter(title__icontains=query)
-    else:
-        tasks = Task.objects.all()
-    return render(request, 'task_list.html', {'tasks': tasks})
+    today = datetime.date.today()
+    tasks_due_today = tasks.filter(Q(due_date=today) & ~Q(status="DONE"))
+    uncompleted_tasks = tasks.filter(~Q(status="DONE"))
+    num_of_tasks_due_today = tasks_due_today.count()
+    context = {
+        'tasks': tasks_due_today,
+        'num_of_tasks_due_today': num_of_tasks_due_today,
+        'msg': 'Tasks due today'
+    }
+    return render(request, 'task_list.html', context)

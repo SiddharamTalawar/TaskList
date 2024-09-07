@@ -5,11 +5,7 @@
   </head>
   <body>
     <h1>Task List</h1>
-    <!-- <form action="{% url 'search-task-list' %}">
-      <label for="search">Search:</label>
-      <input type="text" name="search" id="search" />
-      <button type="submit">Search</button>
-    </form> -->
+
     <form method="get" action="{% url 'task-list' %}">
       <label for="search">Search:</label>
       <input
@@ -36,7 +32,9 @@
       </select>
       <button type="submit">Apply</button>
     </form>
-    {% if tasks %}
+    {% if msg %}
+    <p>{{ msg }}</p>
+    {% endif %} {% if tasks %}
     <table>
       <tr>
         <th>Title</th>
@@ -55,6 +53,8 @@
       </tr>
       {% endfor %}
     </table>
+
+    <p>{{ num_of_tasks_due_today }} tasks due today.</p>
     {% else %}
     <p>No tasks found for these filters/search.</p>
     search: {{ search }}, status: {{ status }}, priority: {{ priority }},
