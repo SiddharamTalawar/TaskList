@@ -3,27 +3,25 @@ from .models import Task
 from django.db.models import Q
 import datetime
 from .forms import TaskForm
+from django.contrib import messages
 
 
 def task_list(request):
     """
     View function for listing tasks.
     """
+    # getting all tasks
     tasks = Task.objects.all()
-    # print("not filterd tasks.....", tasks)
+    total_tasks = tasks.count()
+
+    # getting filters from url
     status = request.GET.get('status')
     priority = request.GET.get('priority')
     due_date = request.GET.get('due_date')
     search = request.GET.get('search')
-    # print("................", status, priority, due_date, search)
 
-    # getting task which are due today and whose status is not done
-    today = datetime.date.today()
-    tasks_due_today = tasks.filter(Q(due_date=today) & ~Q(status="DONE"))
-    num_of_tasks_due_today = tasks_due_today.count()
-    # print("todays tasks.....", todays_tasks.count())
-
-    # applying filters
+    # applying filters to tasks
+    # using Q objects for searching
     if search:
         tasks = tasks.filter(Q(title__icontains=search) |
                              Q(description__icontains=search))
@@ -35,7 +33,18 @@ def task_list(request):
 
     if due_date:
         tasks = tasks.filter(due_date=due_date)
-    # print("filterd tasks.....", tasks)
+
+    # getting task which are due today and whose status is not done
+    # this can be used to show how much tasks are due today in alert message
+    today = datetime.date.today()
+    tasks_due_today = tasks.filter(Q(due_date=today) & ~Q(status="DONE"))
+    num_of_tasks_due_today = tasks_due_today.count()
+
+    # only show message when all the tasks are fetched not when a filter is applied
+    if tasks.count() == total_tasks:
+        messages.info(request, 'Tasks due today: ' +
+                      str(num_of_tasks_due_today))
+
     context = {
         'tasks': tasks,
         'status': status,
@@ -47,6 +56,7 @@ def task_list(request):
     return render(request, 'task_list.html', context)
 
 
+# this tasks_due_today view is currently unused
 def tasks_due_today(request):
     """
     View function for listing tasks due today.
@@ -72,6 +82,7 @@ def create_task(request):
         form = TaskForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Task created successfully')
             return redirect('task-list')
     else:
         form = TaskForm()
@@ -87,6 +98,7 @@ def update_task(request, pk):
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Task updated successfully')
             return redirect('task-list')
     else:
         form = TaskForm(instance=task)
@@ -99,4 +111,5 @@ def delete_task(request, pk):
     """
     task = get_object_or_404(Task, pk=pk)
     task.delete()
+    messages.success(request, 'Task deleted successfully')
     return redirect('task-list')
