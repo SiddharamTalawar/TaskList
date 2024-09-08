@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Task
 from django.db.models import Q
 import datetime
+from .forms import TaskForm
 
 
 def task_list(request):
@@ -61,3 +62,41 @@ def tasks_due_today(request):
         'msg': 'Tasks due today'
     }
     return render(request, 'task_list.html', context)
+
+
+def create_task(request):
+    """
+    View function for creating tasks.
+    """
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('task-list')
+    else:
+        form = TaskForm()
+    return render(request, 'create_task.html', {'form': form, })
+
+
+def update_task(request, pk):
+    """
+    View function for updating tasks.
+    """
+    task = get_object_or_404(Task, pk=pk)
+    if request.method == 'POST':
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect('task-list')
+    else:
+        form = TaskForm(instance=task)
+    return render(request, 'update_task.html', {'form': form, })
+
+
+def delete_task(request, pk):
+    """
+    View function for deleting tasks.
+    """
+    task = get_object_or_404(Task, pk=pk)
+    task.delete()
+    return redirect('task-list')
